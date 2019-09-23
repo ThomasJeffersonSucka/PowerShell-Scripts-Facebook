@@ -1,2 +1,2 @@
-# PowerShcll-Scripts-Facebook
-PowerShcll-Scripts-Facebook
+# PowerShell-Scripts-Facebook
+PowerShell-Scripts-Facebook
