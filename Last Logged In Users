@@ -1,0 +1,18 @@
+$computers = ('localhost')
+$filepath = "$HOME\desktop\last_logged_users.csv"
+
+#Query Local Users to the Computer
+$results1 = @(foreach($computer in $computers){Get-WinEvent -ComputerName $computer -FilterHashtable @{Logname='Security';ID=4672} |`
+ Select @{N='User';E={$_.Properties[1].Value}},TimeCreated |`
+  where{$_.user -ne 'system'} | sort timecreated -Descending |` select -First 1 | select @{N='Computer Name';E={$computer}},user,timecreated})
+
+$results1 | Export-Csv $filepath -NoTypeInformation
+
+#Query AD Users
+$results2 = @(foreach($computer in $computers){Get-WinEvent -ComputerName $computer -FilterHashtable @{Logname='Security';ID=4672} |`
+ Select @{N='User';E={$_.Properties[1].Value}},TimeCreated |`
+  where{$_.user -eq 'phil'} | sort timecreated -Descending |` select -ExpandProperty user -First 1 |`
+   foreach{"*$_*"} | foreach{get-aduser -filter{samaccountname -like $_} -properties * -searchbase "OU path here" |`
+    select @{N='Computer Name';E={$computer}},user,samaccountname,email,timecreated}})
+
+$results2 | Export-Csv $filepath -NoTypeInformation
